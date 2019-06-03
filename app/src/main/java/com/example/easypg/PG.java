@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 /*
 * PG Node POJO*/
-public abstract class PG {
-    private int id;
+public class PG {
+    private String id;
     /*
     * object is created as only one PG is to be created now*/
     private PGDetails details;
@@ -13,10 +13,10 @@ public abstract class PG {
     private ArrayList<Tenant> OnBoardTenants;
 
     //getters and setters
-    public int getId() {
+    public String getId() {
         return id;
     }
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
     public PGDetails getDetails() {
@@ -38,17 +38,17 @@ public abstract class PG {
         OnBoardTenants = onBoardTenants;
     }
 
-//    //constructor
-//    public PG(int id, PGDetails manager,
-//              ArrayList<Tenant> notOnBoardTenants, ArrayList<Tenant> onBoardTenants) {
-//        this.id = id;
-//        this.details = manager;
-//        NotOnBoardTenants = notOnBoardTenants;
-//        OnBoardTenants = onBoardTenants;
-//    }
+    //constructor
+    public PG(String id, PGDetails manager,
+              ArrayList<Tenant> notOnBoardTenants, ArrayList<Tenant> onBoardTenants) {
+        this.id = id;
+        this.details = manager;
+        NotOnBoardTenants = notOnBoardTenants;
+        OnBoardTenants = onBoardTenants;
+    }
 
     //details class structure
-    class PGDetails{
+    static class PGDetails{
         private String name;
         private String phone;
         private String PGName;

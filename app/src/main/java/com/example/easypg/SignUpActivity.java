@@ -12,6 +12,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -21,6 +23,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     ProgressBar progressBar;
 
     private FirebaseAuth mAuth;
+
+//    DatabaseReference database;
+//    PG pg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void init() {
+//        database=FirebaseDatabase.getInstance().getReference();
         email=findViewById(R.id.email);
         password=findViewById(R.id.signup_password);
         signup=findViewById(R.id.signup_button);
@@ -51,8 +57,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 registerUser();
                 break;
             case R.id.login_ref:
-                Intent intent=new Intent(SignUpActivity.this,MainActivity.class);
-                startActivity(intent);
+                finish();
                 break;
         }
     }
@@ -92,8 +97,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBar.setVisibility(View.GONE);
                 if(task.isSuccessful()){
+
                     Toast.makeText(SignUpActivity.this,"Sign Up successfully!"
                             ,Toast.LENGTH_LONG).show();
+
+                    Intent intent=new Intent(SignUpActivity.this,RegistrationActivity.class);
+                    startActivity(intent);
                 }else{
                     if(task.getException() instanceof FirebaseAuthUserCollisionException){
                         Toast.makeText(SignUpActivity.this,"You are already registered!"

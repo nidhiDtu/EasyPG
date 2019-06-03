@@ -24,7 +24,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
 
     private void init() {
         phoneEditText=findViewById(R.id.phone);
-        loginButton.findViewById(R.id.login_button);
+        loginButton=findViewById(R.id.login_button);
         manager_ref=findViewById(R.id.manager_ref);
 
         loginButton.setOnClickListener(this);
@@ -35,8 +35,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.manager_ref:
-                Intent intent=new Intent(PhoneAuthActivity.this,MainActivity.class);
-                startActivity(intent);
+                finish();
                 break;
             case R.id.login_button:
                 String phone=phoneEditText.getText().toString();

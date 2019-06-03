@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 progressBar.setVisibility(View.GONE);
 
                 if(task.isSuccessful()){
+                    startActivity(new Intent(getApplicationContext(),ManagerPortalActivity.class));
                     Toast.makeText(MainActivity.this,"Sign Up successfully!"
                             ,Toast.LENGTH_LONG).show();
                 }else{
