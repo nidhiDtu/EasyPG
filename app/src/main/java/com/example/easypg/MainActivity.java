@@ -20,7 +20,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button login;
     EditText username,password;
     ProgressBar progressBar;
-    boolean managerbool=true;
 
     FirebaseAuth mAuth;
 
@@ -35,40 +34,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void init() {
+        //to set the UI
         username =findViewById(R.id.username);
         password=findViewById(R.id.signin_password);
         signup_ref=findViewById(R.id.signup_ref);
         login=findViewById(R.id.login_button);
         progressBar=findViewById(R.id.progress);
-        tenantormanager=findViewById(R.id.tenantormanager_ref);
+        tenantormanager=findViewById(R.id.tenant_ref);
 
         tenantormanager.setOnClickListener(this);
         signup_ref.setOnClickListener(this);
         login.setOnClickListener(this);
-
-        if(!managerbool){
-            tenantormanager.setText("Manager? Click Here!");
-        }
     }
 
     @Override
     public void onClick(View view) {
+        Intent intent;
         switch (view.getId()){
-            case R.id.tenantormanager_ref:
-                if(managerbool){
-                   managerbool=false;
-                   tenantormanager.setText("Manager? Click Here!");
-                   username.setInputType(InputType.TYPE_CLASS_PHONE);
-                   login.setText("Tenant LOGIN");
-                }else{
-                    managerbool=true;
-                    tenantormanager.setText("Tenant? Click Here!");
-                    username.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-                    login.setText("Manager LOGIN");
-                }
+            case R.id.tenant_ref:
+                intent=new Intent(MainActivity.this,PhoneAuthActivity.class);
+                startActivity(intent);
                 break;
             case R.id.signup_ref:
-                Intent intent=new Intent(this,SignUpActivity.class);
+                intent=new Intent(MainActivity.this,SignUpActivity.class);
                 startActivity(intent);
                 break;
             case R.id.login_button:
@@ -78,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void userLogin() {
+        //for logging in
         String username= this.username.getText().toString();
         String pass=password.getText().toString();
 
@@ -99,45 +88,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
 
-        if(managerbool){
-            if(!Patterns.EMAIL_ADDRESS.matcher(username).matches()){
-                this.username.setError("Please enter a valid email address!");
-                this.username.requestFocus();
-                return;
-            }
-
-        }else{
-            if(!Patterns.PHONE.matcher(username).matches()){
-                this.username.setError("Please enter a valid Phone number address!");
-                this.username.requestFocus();
-                return;
-            }
+        if(!Patterns.EMAIL_ADDRESS.matcher(username).matches()){
+            this.username.setError("Please enter a valid email address!");
+            this.username.requestFocus();
+            return;
         }
         progressBar.setVisibility(View.VISIBLE);
 
-        if(managerbool){
-            mAuth.signInWithEmailAndPassword(username,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    progressBar.setVisibility(View.GONE);
+        //email address login of managers
+        mAuth.signInWithEmailAndPassword(username,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                progressBar.setVisibility(View.GONE);
 
-                    if(task.isSuccessful()){
-                        Toast.makeText(MainActivity.this,"Sign Up successfully!"
+                if(task.isSuccessful()){
+                    Toast.makeText(MainActivity.this,"Sign Up successfully!"
+                            ,Toast.LENGTH_LONG).show();
+                }else{
+                    if(task.getException() instanceof FirebaseAuthInvalidCredentialsException){
+                        Toast.makeText(MainActivity.this,"Email or Password is incorrect!"
                                 ,Toast.LENGTH_LONG).show();
-                    }else{
-                        if(task.getException() instanceof FirebaseAuthInvalidCredentialsException){
-                            Toast.makeText(MainActivity.this,"Email or Password is incorrect!"
-                                    ,Toast.LENGTH_LONG).show();
-                        }else {
-                            Toast.makeText(MainActivity.this,task.getException().getMessage()
-                                    ,Toast.LENGTH_LONG).show();
-                        }
+                    }else {
+                        Toast.makeText(MainActivity.this,task.getException().getMessage()
+                                ,Toast.LENGTH_LONG).show();
                     }
                 }
-            });
-        }else{
-
-        }
+            }
+        });
 
 
     }

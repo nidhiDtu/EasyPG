@@ -5,8 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:orientation="vertical">
+    tools:context=".MainActivity">
 
     <ImageView
             android:id="@+id/icon"
@@ -15,7 +14,7 @@
             android:src="@drawable/easy_pg_icon"/>
 
     <TextView
-            android:id="@+id/tenantormanager_ref"
+            android:id="@+id/tenant_ref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
@@ -31,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="email address"
-            android:layout_below="@id/tenantormanager_ref"
+            android:layout_below="@id/tenant_ref"
             android:layout_marginTop="20dp"
             android:inputType="textEmailAddress"/>
 
