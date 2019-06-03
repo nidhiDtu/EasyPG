@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "237549048564",
+    "firebase_url": "https://easypg-c4e62.firebaseio.com",
+    "project_id": "easypg-c4e62",
+    "storage_bucket": "easypg-c4e62.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237549048564:android:8bb1bcb01e5bf41c",
+        "android_client_info": {
+          "package_name": "com.example.easypg"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "237549048564-vkjjr02m5tag94va6agbtq8cig3pi9f2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.easypg",
+            "certificate_hash": "b640e0301a4f99bdc6a595f9a7283978732e4866"
+          }
+        },
+        {
+          "client_id": "237549048564-50idpld67gnjc7a7k80c1s06vu5n7lut.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBc63lKMbhuYJb2ylNWPcqiaUBgmBsKfic"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "237549048564-50idpld67gnjc7a7k80c1s06vu5n7lut.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

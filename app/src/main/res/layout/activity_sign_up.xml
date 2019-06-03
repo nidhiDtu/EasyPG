@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".SignUpActivity">
+
+    <ImageView
+            android:id="@+id/icon"
+            android:layout_width="match_parent"
+            android:layout_height="301dp"
+            android:src="@drawable/easy_pg_icon"/>
+
+    <EditText
+            android:id="@+id/email"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:inputType="textEmailAddress"
+            android:hint="Email"
+            android:layout_below="@id/icon"/>
+
+    <EditText
+            android:id="@+id/signup_password"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:layout_below="@id/email"/>
+
+    <Button
+            android:id="@+id/signup_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:text="SIGN UP"
+            android:paddingVertical="10dp"
+            android:textAlignment="center"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/signup_password"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+
+    <TextView
+            android:id="@+id/login_ref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="have an account? Login"
+            android:padding="20dp"
+            android:textAlignment="center"
+            android:layout_below="@id/signup_button"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+
+    <ProgressBar
+            android:id="@+id/progressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone"/>
+
+</RelativeLayout>
