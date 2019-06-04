@@ -6,8 +6,6 @@ import java.util.ArrayList;
 * PG Node POJO*/
 public class PG {
     private String id;
-    /*
-    * object is created as only one PG is to be created now*/
     private PGDetails details;
     private ArrayList<Tenant> NotOnBoardTenants;
     private ArrayList<Tenant> OnBoardTenants;

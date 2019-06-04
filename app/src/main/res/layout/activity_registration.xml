@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:hint="Date of creation"
         android:layout_below="@id/pincode"
-        android:inputType="date" />
+        android:inputType="datetime" />
 
     <Button
         android:id="@+id/submit"

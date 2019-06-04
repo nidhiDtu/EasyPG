@@ -12,12 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".RegistrationActivity"></activity>
-        <activity android:name=".AddTenantActivity" />
+        <activity android:name=".AddTenantActivity"/>
         <activity
-            android:name=".ManagerPortalActivity" />
+            android:name=".ManagerPortalActivity"/>
         <activity android:name=".PhoneAuthActivity" />
         <activity android:name=".SignUpActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

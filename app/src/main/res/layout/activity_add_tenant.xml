@@ -1,9 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AddTenantActivity">
 
-</android.support.constraint.ConstraintLayout>
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:id="@+id/toolbar"
+        android:elevation="5dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:padding="5dp"
+            android:text="Add A New Tenant"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+
+    </android.support.v7.widget.Toolbar>
+
+    <EditText
+        android:layout_marginTop="30dp"
+        android:id="@+id/name_edittext"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"
+        android:layout_below="@id/toolbar"
+        android:inputType="text"/>
+
+    <EditText
+        android:id="@+id/phone_edittext"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Phone number"
+        android:layout_below="@id/name_edittext"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/room"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Room"
+        android:layout_below="@id/phone_edittext"
+        android:inputType="text"/>
+
+    <EditText
+        android:id="@+id/rentAmt"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Rent Amount"
+        android:layout_below="@id/room"
+        android:inputType="text"/>
+
+    <Button
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_below="@id/rentAmt"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:text="SAVE"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:background="@color/colorPrimary"/>
+
+</RelativeLayout>
