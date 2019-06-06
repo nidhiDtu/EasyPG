@@ -2,6 +2,7 @@ package com.example.easypg;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -12,8 +13,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -23,9 +23,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     ProgressBar progressBar;
 
     private FirebaseAuth mAuth;
-
-//    DatabaseReference database;
-//    PG pg;
+    FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +38,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     private void init() {
 //        database=FirebaseDatabase.getInstance().getReference();
+        firebaseUser=mAuth.getCurrentUser();
         email=findViewById(R.id.email);
         password=findViewById(R.id.signup_password);
         signup=findViewById(R.id.signup_button);
@@ -102,7 +101,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             ,Toast.LENGTH_LONG).show();
 
                     Intent intent=new Intent(SignUpActivity.this,RegistrationActivity.class);
-                    startActivity(intent);
+                    intent.putExtra("aboutIntent","create");
+                    startActivityForResult(intent,1);
                 }else{
                     if(task.getException() instanceof FirebaseAuthUserCollisionException){
                         Toast.makeText(SignUpActivity.this,"You are already registered!"
@@ -115,5 +115,26 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
 
+    }
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
+//        if(firebaseUser!=null){
+//            Intent intent=new Intent(SignUpActivity.this,ManagerPortalActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(intent);
+//        }
+//    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1){
+            if(resultCode==1){
+
+            }
+        }
     }
 }

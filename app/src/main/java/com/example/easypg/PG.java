@@ -35,14 +35,16 @@ public class PG {
     public void setOnBoardTenants(ArrayList<Tenant> onBoardTenants) {
         OnBoardTenants = onBoardTenants;
     }
+    public PG() {
+    }
 
     //constructor
     public PG(String id, PGDetails manager,
               ArrayList<Tenant> notOnBoardTenants, ArrayList<Tenant> onBoardTenants) {
         this.id = id;
         this.details = manager;
-        NotOnBoardTenants = notOnBoardTenants;
-        OnBoardTenants = onBoardTenants;
+        this.NotOnBoardTenants = notOnBoardTenants;
+        this.OnBoardTenants = onBoardTenants;
     }
 
     //details class structure
@@ -93,6 +95,8 @@ public class PG {
         }
         public void setDateCreated(String dateCreated) {
             this.dateCreated = dateCreated;
+        }
+        public PGDetails() {
         }
     }
 

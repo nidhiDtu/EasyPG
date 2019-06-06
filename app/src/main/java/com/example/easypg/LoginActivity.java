@@ -2,6 +2,7 @@ package com.example.easypg;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -12,6 +13,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseUser;
 
 //LOGIN_ACTIVITY
 
@@ -23,6 +25,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     ProgressBar progressBar;
 
     FirebaseAuth mAuth;
+    FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +39,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void init() {
         //to set the UI
+        firebaseUser=mAuth.getCurrentUser();
         username =findViewById(R.id.username);
         password=findViewById(R.id.signin_password);
         signup_ref=findViewById(R.id.signup_ref);
@@ -117,7 +121,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
         });
-
-
     }
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
+//        if(firebaseUser!=null){
+//            Intent intent=new Intent(LoginActivity.this,ManagerPortalActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(intent);
+//        }
+//    }
 }

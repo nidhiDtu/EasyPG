@@ -46,4 +46,24 @@
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
 
+    <Button
+        android:id="@+id/signup_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:text="SIGN UP"
+        android:layout_marginTop="20dp"
+        android:paddingVertical="10dp"
+        android:layout_below="@id/login_button"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"/>
+
 </RelativeLayout>

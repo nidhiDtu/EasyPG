@@ -4,28 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddTenantActivity">
+    tools:context=".TenantDetailsActivity">
 
-    <!--<android.support.v7.widget.Toolbar-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="?attr/actionBarSize"-->
-        <!--android:background="@color/colorPrimary"-->
-        <!--android:id="@+id/toolbar"-->
-        <!--android:elevation="5dp">-->
-
-        <!--<TextView-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textAlignment="center"-->
-            <!--android:padding="5dp"-->
-            <!--android:text="Add A New Tenant"-->
-            <!--android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>-->
-
-    <!--</android.support.v7.widget.Toolbar>-->
-
-    <EditText
+    <TextView
         android:layout_marginTop="30dp"
-        android:id="@+id/name_edittext"
+        android:id="@+id/name"
         android:paddingHorizontal="20dp"
         android:paddingVertical="20dp"
         android:layout_width="match_parent"
@@ -33,27 +16,27 @@
         android:hint="Name"
         android:inputType="text"/>
 
-    <EditText
-        android:id="@+id/phone_edittext"
+    <TextView
+        android:id="@+id/phone"
         android:paddingHorizontal="20dp"
         android:paddingVertical="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Phone number"
-        android:layout_below="@id/name_edittext"
+        android:layout_below="@id/name"
         android:inputType="number"/>
 
-    <EditText
+    <TextView
         android:id="@+id/room"
         android:paddingHorizontal="20dp"
         android:paddingVertical="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Room"
-        android:layout_below="@id/phone_edittext"
+        android:layout_below="@id/phone"
         android:inputType="text"/>
 
-    <EditText
+    <TextView
         android:id="@+id/rentAmt"
         android:paddingHorizontal="20dp"
         android:paddingVertical="20dp"
@@ -61,17 +44,17 @@
         android:layout_height="wrap_content"
         android:hint="Rent Amount"
         android:layout_below="@id/room"
-        android:inputType="numberDecimal"/>
+        android:inputType="text"/>
 
     <Button
-        android:id="@+id/save"
+        android:id="@+id/edit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:layout_below="@id/rentAmt"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
-        android:text="SAVE"
+        android:text="EDIT TENANT DETAILS"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:background="@color/colorPrimary"/>
 

@@ -11,10 +11,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".RegistrationActivity"></activity>
-        <activity android:name=".AddTenantActivity"/>
-        <activity
-            android:name=".ManagerPortalActivity"/>
+        <activity android:name=".EditTenantActivity"></activity>
+        <activity android:name=".TenantDetailsActivity" />
+        <activity android:name=".RegistrationActivity" />
+        <activity android:name=".AddTenantActivity" />
+        <activity android:name=".ManagerPortalActivity"></activity>
         <activity android:name=".PhoneAuthActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".LoginActivity">

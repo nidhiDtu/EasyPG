@@ -4,7 +4,6 @@ package com.example.easypg;
 public class Tenant {
 
     private String id;
-
     private TenantDetails details;
 
     public Tenant() {
@@ -30,12 +29,28 @@ public class Tenant {
         String phone;
         String room;
         String rentAmount;
+        String pgId;
 
+        public TenantDetails() {
+        }
         public TenantDetails(String name, String phone, String room, String rentAmount) {
+            this.name = name;
+            this.phone =phone;
+            this.room = room;
+            this.rentAmount = rentAmount;
+        }
+        public TenantDetails(String name, String phone, String room, String rentAmount, String pgId) {
             this.name = name;
             this.phone = phone;
             this.room = room;
             this.rentAmount = rentAmount;
+            this.pgId = pgId;
+        }
+        public String getPgId() {
+            return pgId;
+        }
+        public void setPgId(String pgId) {
+            this.pgId = pgId;
         }
         public String getName() {
             return name;

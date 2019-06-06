@@ -14,6 +14,7 @@ public class TenantViewAdapter extends RecyclerView.Adapter<TenantViewAdapter.Te
 
     public interface OnItemClickListner{
         void onItemClick(int position);
+        void onItemLongClick(int position);
     }
 
     private ArrayList<Tenant> tenantList;
@@ -37,17 +38,31 @@ public class TenantViewAdapter extends RecyclerView.Adapter<TenantViewAdapter.Te
 
     @Override
     public void onBindViewHolder(@NonNull final TenantViewHolder tenantViewHolder, int i) {
+        Tenant tenant=tenantList.get(i);
+        Tenant.TenantDetails tenantDetails=tenant.getDetails();
+        tenantViewHolder.name.setText(tenantDetails.name);
+        tenantViewHolder.phone.setText(tenantDetails.phone);
+        tenantViewHolder.room.setText(tenantDetails.room);
+        tenantViewHolder.rent.setText(tenantDetails.rentAmount);
+
         tenantViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mListner.onItemClick(tenantViewHolder.getAdapterPosition());
             }
         });
+        tenantViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                mListner.onItemLongClick(tenantViewHolder.getAdapterPosition());
+                return true;
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return tenantList.size();
     }
 
     class TenantViewHolder extends RecyclerView.ViewHolder{
