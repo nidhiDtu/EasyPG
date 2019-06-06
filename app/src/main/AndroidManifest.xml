@@ -15,7 +15,8 @@
         <activity android:name=".TenantDetailsActivity" />
         <activity android:name=".RegistrationActivity" />
         <activity android:name=".AddTenantActivity" />
-        <activity android:name=".ManagerPortalActivity"></activity>
+        <activity android:name=".ManagerPortalActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".PhoneAuthActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".LoginActivity">

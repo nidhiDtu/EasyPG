@@ -55,7 +55,7 @@ public class ManagerPortalActivity extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()){
                     case R.id.add_new_tenant:
-                        startActivityForResult(new Intent(getApplicationContext(),AddTenantActivity.class),3);
+                        startActivity(new Intent(getApplicationContext(),AddTenantActivity.class));
                         break;
                     case R.id.editinfo:
                         Intent intent=new Intent(ManagerPortalActivity.this,RegistrationActivity.class);
@@ -104,7 +104,7 @@ public class ManagerPortalActivity extends AppCompatActivity {
                         * for confirmation before deleting an item
                         * from the tenant list on PG1*/
 
-                        Toast.makeText(getApplicationContext(),"Item long Click!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),"Item deleted!",Toast.LENGTH_LONG).show();
                         Tenant tenant=onBoardTenants.get(position);
                         String id=tenant.getDetails().getPhone();
                         DatabaseReference item=database.child(id);
@@ -131,8 +131,6 @@ public class ManagerPortalActivity extends AppCompatActivity {
         if(requestCode==2){
             if(resultCode==2){
                 //manager info update call
-            }else if(resultCode==3){
-
             }
         }
     }

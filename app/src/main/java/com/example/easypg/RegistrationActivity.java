@@ -100,9 +100,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
         pg=new PG("0", pgDetails,new ArrayList<Tenant>(),new ArrayList<Tenant>());
 
         String id=database.setValue(pg).toString();
-        if(id!=""){
-            Toast.makeText(getApplicationContext(),"manager added successfully!",Toast.LENGTH_LONG).show();
-        }
+
         pg.setId(id);
 
         Intent intent1=new Intent();

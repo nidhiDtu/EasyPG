@@ -36,7 +36,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
 
     TextView manager_ref;
     EditText phoneEditText;
-    Button loginButton,signupButton;
+    Button signupButton;
     ProgressBar progressBar;
 
     String phone;
@@ -58,11 +58,9 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
 
         progressBar=findViewById(R.id.progressbar);
         phoneEditText=findViewById(R.id.phone);
-        loginButton=findViewById(R.id.login_button);
         manager_ref=findViewById(R.id.manager_ref);
         signupButton=findViewById(R.id.signup_button);
 
-        loginButton.setOnClickListener(this);
         manager_ref.setOnClickListener(this);
         signupButton.setOnClickListener(this);
     }
@@ -80,9 +78,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
             case R.id.manager_ref:
                 finish();
                 break;
-            case R.id.login_button:
-//                tenantLogin();
-                break;
+
             case R.id.signup_button:
                 findThePhoneNoInTheTenant();
                 break;
@@ -205,7 +201,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
 //        firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
 //        if(firebaseUser!=null){
 //            Intent intent=new Intent(PhoneAuthActivity.this,TenantDetailsActivity.class);
-//            intent.putExtra("phone",phone);
+//            intent.putExtra("phone",firebaseUser.getPhoneNumber());
 //            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //            startActivity(intent);
 //        }

@@ -35,6 +35,7 @@ public class TenantDetailsActivity extends AppCompatActivity implements View.OnC
 
         Intent intent=getIntent();
         id=intent.getStringExtra("phone");
+        if(id==null) id=firebaseUser.getPhoneNumber();
         mAuth=FirebaseAuth.getInstance();
         firebaseUser=mAuth.getCurrentUser();
         init();
@@ -50,13 +51,14 @@ public class TenantDetailsActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 tenant=dataSnapshot.getValue(Tenant.class);
-                name.setText(tenant.getDetails().getName());
-                phone.setText(tenant.getDetails().getPhone());
-                room.setText(tenant.getDetails().getRoom());
-                rent.setText(tenant.getDetails().getRentAmount());
+                if(tenant!=null && tenant.getDetails()!=null){
+                    name.setText(tenant.getDetails().getName());
+                    phone.setText(tenant.getDetails().getPhone());
+                    room.setText(tenant.getDetails().getRoom());
+                    rent.setText(tenant.getDetails().getRentAmount());
 
-                if(firebaseUser!=null)
                     copyTenantFromOnBoardToTenant(firebaseUser.getUid());
+                }
             }
 
             @Override
@@ -86,6 +88,9 @@ public class TenantDetailsActivity extends AppCompatActivity implements View.OnC
 
         Tenant newTenant=new Tenant(new Tenant.TenantDetails(tenant.getDetails().name,tenant.getDetails()
                 .phone,tenant.getDetails().room,tenant.getDetails().getRentAmount(),"0"));
+
+        onBoard.child(id).removeValue();
+        tenants.child(authkey).removeValue();
         String id1=onBoard.child(id).setValue(tenant).toString();
         String id2=tenants.child(authkey).setValue(newTenant).toString();
 
@@ -103,7 +108,8 @@ public class TenantDetailsActivity extends AppCompatActivity implements View.OnC
                 Intent intent=new Intent(TenantDetailsActivity.this,EditTenantActivity.class);
                 intent.putExtra("phone",id);
                 //request code edit the tenant is 2 and for adding it is 1
-                startActivityForResult(intent,2);
+
+                startActivity(intent);
                 break;
         }
     }
