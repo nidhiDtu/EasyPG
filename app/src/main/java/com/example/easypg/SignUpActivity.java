@@ -29,16 +29,16 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
+//
+//        // Initialize Firebase Auth
+//        mAuth = FirebaseAuth.getInstance();
 
         init();
     }
 
     private void init() {
 //        database=FirebaseDatabase.getInstance().getReference();
-        firebaseUser=mAuth.getCurrentUser();
+//        firebaseUser=mAuth.getCurrentUser();
         email=findViewById(R.id.email);
         password=findViewById(R.id.signup_password);
         signup=findViewById(R.id.signup_button);

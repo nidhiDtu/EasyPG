@@ -108,21 +108,21 @@ public class TenantDetailsActivity extends AppCompatActivity implements View.OnC
                 Intent intent=new Intent(TenantDetailsActivity.this,EditTenantActivity.class);
                 intent.putExtra("phone",id);
                 //request code edit the tenant is 2 and for adding it is 1
-
+                TenantDetailsActivity.this.finish();
                 startActivity(intent);
                 break;
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==2){
-            if(resultCode==2){
-                Bundle bundle=data.getExtras();
-                String i=bundle.getString("phone","-1");
-                if(i!="-1") id=i;
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if(requestCode==2){
+//            if(resultCode==2){
+//                Bundle bundle=data.getExtras();
+//                String i=bundle.getString("phone","-1");
+//                if(i!="-1") id=i;
+//            }
+//        }
+//    }
 }

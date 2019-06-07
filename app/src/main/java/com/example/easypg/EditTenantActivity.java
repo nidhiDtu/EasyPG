@@ -91,8 +91,9 @@ public class EditTenantActivity extends AppCompatActivity {
                         for (DataSnapshot child:dataSnapshot.getChildren()){
                             Tenant ref=child.getValue(Tenant.class);
                             if(ref.getDetails().getPhone()==id && !dataSnapshot.hasChild(ref.getId())){
-                                tenants.child(ref.getId()).removeValue();
-                                tenants.child(ref.getId()).setValue(newTenant);
+                                DatabaseReference newRef=tenants.child(ref.getId()).child("details");
+                                newRef.removeValue();
+                                newRef.setValue(ref.getDetails());
                                 break;
                             }
                         }
@@ -101,13 +102,21 @@ public class EditTenantActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError databaseError) { }
                 });
 
+                //updating tenant in noOnBoardtenants
+                DatabaseReference notOnBoard=FirebaseDatabase.getInstance().getReference("PG").child("0").child("NotOnBoardTenants");
+                notOnBoard.child(id).removeValue();
+                notOnBoard.child(newPhone).setValue(newTenant);
+
                 //updating tenant in onBoardtenants
                 DatabaseReference onboard=FirebaseDatabase.getInstance()
                         .getReference("PG").child("0").child("OnBoardTenants");
 
                 onboard.child(id).removeValue();
                 id=onboard.child(newPhone).setValue(newTenant).toString();
-
+                Toast.makeText(EditTenantActivity.this,id,Toast.LENGTH_LONG).show();
+//                Intent intent=new Intent();
+//                intent.putExtra("phone",id);
+//                setResult(2,intent);
                 finish();
             }
         });

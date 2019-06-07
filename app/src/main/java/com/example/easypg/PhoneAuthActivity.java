@@ -135,7 +135,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
                     //set flag and call user activity
                     Intent intent=new Intent(PhoneAuthActivity.this,TenantDetailsActivity.class);
                     intent.putExtra("phone",phone);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }else{
                     Toast.makeText(PhoneAuthActivity.this,task.getException().getMessage(),Toast.LENGTH_LONG).show();

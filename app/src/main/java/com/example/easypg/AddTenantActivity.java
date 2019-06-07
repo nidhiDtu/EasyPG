@@ -90,10 +90,6 @@ public class AddTenantActivity extends AppCompatActivity implements View.OnClick
         details=new Tenant.TenantDetails(name,phone,room,rentamt);
         tenant=new Tenant(details);
 
-        if(database.child(phone)!=null){
-            Toast.makeText(AddTenantActivity.this,"This number already exists!",Toast.LENGTH_SHORT).show();
-            return;
-        }
         String id=database.child(phone).setValue(tenant).toString();
         tenant.setId(id);
 
