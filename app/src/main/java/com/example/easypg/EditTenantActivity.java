@@ -1,7 +1,11 @@
 package com.example.easypg;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,8 +22,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
+
 public class EditTenantActivity extends AppCompatActivity {
 
+    private static final int PICK_IMAGE_REQUEST = 5;
     EditText name,phone;
     TextView room,rent;
     ImageView profile;
@@ -28,6 +35,7 @@ public class EditTenantActivity extends AppCompatActivity {
     String id;
     Tenant tenant;
     DatabaseReference databaseReference;
+    private Uri uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,8 +132,32 @@ public class EditTenantActivity extends AppCompatActivity {
             @Override
             public boolean onLongClick(View view) {
                 //upload profile
+                showFileChooser();
                 return true;
             }
         });
+    }
+
+    private void showFileChooser(){
+        Intent intent=new Intent();
+        intent.setType("image/+");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent,"Select an image."),PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==PICK_IMAGE_REQUEST && resultCode==RESULT_OK
+                && data!=null && data.getData()!=null){
+//image selected successfully
+            uri=data.getData();
+            try {
+                Bitmap bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
+                profile.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
