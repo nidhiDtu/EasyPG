@@ -1,5 +1,6 @@
 package com.example.easypg;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -15,26 +16,34 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 
 public class EditTenantActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 5;
+    private static final int CAMERA_ACCESS_REQUEST=6;
     EditText name,phone;
     TextView room,rent;
     ImageView profile;
-    Button save;
+    Button save,cancel,upload,camera;
 
     String id;
     Tenant tenant;
     DatabaseReference databaseReference;
+    StorageReference storageReference;
     private Uri uri;
 
     @Override
@@ -72,12 +81,44 @@ public class EditTenantActivity extends AppCompatActivity {
 
     private void init() {
         databaseReference= FirebaseDatabase.getInstance().getReference("PG").child("0").child("NotOnBoardTenants");
+        storageReference= FirebaseStorage.getInstance().getReference();
         name=findViewById(R.id.name_edittext);
         phone=findViewById(R.id.phone_edittext);
         room=findViewById(R.id.room);
         rent=findViewById(R.id.rentAmt);
         profile=findViewById(R.id.profilepic);
         save=findViewById(R.id.save);
+        cancel=findViewById(R.id.cancel);
+        camera=findViewById(R.id.camera);
+        upload=findViewById(R.id.upload);
+
+        upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //upload profile
+//                Intent intent=new Intent(EditTenantActivity.this,UploadImage.class);
+//                intent.putExtra("phone",id);
+                showFileChooser();
+            }
+        });
+
+        camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent,CAMERA_ACCESS_REQUEST);
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                save.setEnabled(false);
+                camera.setEnabled(false);
+                upload.setEnabled(false);
+                finish();
+            }
+        });
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,14 +169,6 @@ public class EditTenantActivity extends AppCompatActivity {
                 finish();
             }
         });
-        profile.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                //upload profile
-                showFileChooser();
-                return true;
-            }
-        });
     }
 
     private void showFileChooser(){
@@ -143,6 +176,46 @@ public class EditTenantActivity extends AppCompatActivity {
         intent.setType("image/+");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent,"Select an image."),PICK_IMAGE_REQUEST);
+    }
+
+    private void uploadFile(){
+        if(uri!=null){
+
+            final ProgressDialog progressDialog=new ProgressDialog(this);
+            progressDialog.setTitle("Uploading...");
+            progressDialog.show();
+
+            StorageReference Ref = storageReference.child("images/"+id+"-profilejpg");
+
+            Ref.putFile(uri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Get a URL to the uploaded content
+                            progressDialog.dismiss();
+                            Toast.makeText(getApplicationContext(),"Upload successful!",Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            int progress=(int)((100.0*taskSnapshot.getBytesTransferred())/taskSnapshot.getTotalByteCount());
+                            progressDialog.setMessage(progress+"Uploaded..");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            // ...
+                            progressDialog.dismiss();
+                            Toast.makeText(getApplicationContext(),exception.getMessage(),Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }else{
+            //Error toast
+            Toast.makeText(getApplicationContext(),"Select an image first.",Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -155,9 +228,27 @@ public class EditTenantActivity extends AppCompatActivity {
             try {
                 Bitmap bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
                 profile.setImageBitmap(bitmap);
+                uploadFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (requestCode==CAMERA_ACCESS_REQUEST && resultCode==RESULT_OK
+                && data!=null && data.getData()!=null){
+            uri=data.getData();
+            try {
+                Bitmap bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
+                profile.setImageBitmap(bitmap);
+                uploadFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
+//    @Override
+//    public void onBackPressed() {
+//        super.onBackPressed();
+//        finish();
+//    }
 }

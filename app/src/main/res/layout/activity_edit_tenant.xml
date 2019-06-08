@@ -7,7 +7,7 @@
     tools:context=".EditTenantActivity">
 
     <ImageView
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:id="@+id/profilepic"
         android:layout_width="200dp"
         android:layout_height="200dp"
@@ -15,7 +15,7 @@
         android:src="@drawable/black_profile"/>
 
     <EditText
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:id="@+id/name_edittext"
         android:paddingHorizontal="20dp"
         android:paddingVertical="20dp"
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:hint="Name"
         android:inputType="text"
-        android:layout_below="@id/profilepic"/>
+        android:layout_below="@id/camera"/>
 
     <EditText
         android:id="@+id/phone_edittext"
@@ -61,14 +61,48 @@
 
     <Button
         android:id="@+id/save"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:layout_below="@id/rentAmt"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:text="SAVE"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:background="@color/colorPrimary"/>
+
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_below="@id/save"
+        android:layout_marginTop="20dp"
+        android:text="CANCEL"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:background="@color/colorPrimary"/>
+
+    <Button
+        android:id="@+id/upload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:layout_below="@id/profilepic"
+        android:layout_marginTop="20dp"
+        android:text="Upload"
+        android:layout_alignRight="@id/profilepic"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:background="@color/colorPrimary"/>
+
+    <Button
+        android:id="@+id/camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:layout_below="@id/profilepic"
+        android:layout_marginTop="20dp"
+        android:text="Camera"
+        android:layout_alignLeft="@id/profilepic"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:background="@color/colorPrimary"/>
 
 </RelativeLayout>

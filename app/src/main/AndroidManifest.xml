@@ -3,6 +3,15 @@
     package="com.example.easypg">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />-->
+    <!--<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />-->
+    <!--<uses-feature-->
+        <!--android:name="android.hardware.camera.any"-->
+        <!--android:required="true" />-->
+    <!--<uses-feature-->
+        <!--android:name="android.hardware.camera.autofocus"-->
+        <!--android:required="false" />-->
 
     <application
         android:allowBackup="true"
@@ -11,12 +20,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".EditTenantActivity"></activity>
+        <activity android:name=".UploadImage"></activity>
+        <activity android:name=".EditTenantActivity" />
         <activity android:name=".TenantDetailsActivity" />
         <activity android:name=".RegistrationActivity" />
         <activity android:name=".AddTenantActivity" />
-        <activity android:name=".ManagerPortalActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".ManagerPortalActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".PhoneAuthActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".LoginActivity">

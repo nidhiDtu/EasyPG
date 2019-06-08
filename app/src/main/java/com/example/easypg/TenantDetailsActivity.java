@@ -1,15 +1,19 @@
 package com.example.easypg;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -17,16 +21,26 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.File;
+import java.io.IOException;
 
 public class TenantDetailsActivity extends AppCompatActivity implements View.OnClickListener {
 
     TextView name,phone,room,rent;
     Button edit;
+    ImageView profile;
+
     String id;//phone
     Tenant tenant;
     DatabaseReference database;//PG/0/NotOnBoardTenants db
     FirebaseAuth mAuth;
     FirebaseUser firebaseUser;
+    StorageReference storageReference;
+    private Uri uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +71,12 @@ public class TenantDetailsActivity extends AppCompatActivity implements View.OnC
                     room.setText(tenant.getDetails().getRoom());
                     rent.setText(tenant.getDetails().getRentAmount());
 
+                    try {
+                        downloadFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                     copyTenantFromOnBoardToTenant(firebaseUser.getUid());
                 }
             }
@@ -69,14 +89,33 @@ public class TenantDetailsActivity extends AppCompatActivity implements View.OnC
 
     }
 
+    private void downloadFile() throws IOException {
+        File localFile = File.createTempFile("images", "jpg");
+        storageReference.getFile(localFile)
+                .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        // Successfully downloaded data to local file
+                        // ...
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle failed download
+                // ...
+            }
+        });
+    }
+
     private void init() {
+        profile=findViewById(R.id.profilepic);
         name=findViewById(R.id.name);
         phone=findViewById(R.id.phone);
         room=findViewById(R.id.room);
         rent=findViewById(R.id.rentAmt);
         edit=findViewById(R.id.edit_button);
         database=FirebaseDatabase.getInstance().getReference("PG").child("0").child("NotOnBoardTenants");
-
+        storageReference= FirebaseStorage.getInstance().getReference();
         edit.setOnClickListener(this);
     }
 
