@@ -34,16 +34,24 @@ import java.util.concurrent.TimeUnit;
 
 public class PhoneAuthActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextView manager_ref;
-    EditText phoneEditText;
-    Button signupButton;
-    ProgressBar progressBar;
+    public static String uid;
+    private TextView manager_ref;
+    private EditText phoneEditText;
+    private Button signupButton;
+    private ProgressBar progressBar;
 
-    String phone;
-    String otp;
+    private String phone;
+    private String otp;
     private String verificationId;
-    FirebaseAuth mAuth;
-    FirebaseUser firebaseUser;
+    private Tenant tenant;
+
+    private FirebaseAuth mAuth;
+    private FirebaseUser firebaseUser;
+    private DatabaseReference notOnBoardDB;
+    private DatabaseReference onBoardDB;
+    private DatabaseReference tenants;
+    private DatabaseReference pg;
+    private PhoneAuthCredential phoneAuthCredential;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +63,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
 
     private void init() {
         mAuth=FirebaseAuth.getInstance();
+        uid=mAuth.getUid();
 
         progressBar=findViewById(R.id.progressbar);
         phoneEditText=findViewById(R.id.phone);
@@ -63,6 +72,12 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
 
         manager_ref.setOnClickListener(this);
         signupButton.setOnClickListener(this);
+
+        //DB instances
+        onBoardDB=Databases.getOnBoardDB();
+        notOnBoardDB=Databases.getNotOnBoardDB();
+        pg=Databases.getPgDB();
+        tenants=Databases.getTenantsDB();
     }
 
     @Override
@@ -76,10 +91,12 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
         }
         switch (view.getId()){
             case R.id.manager_ref:
+                signupButton.setEnabled(false);
                 finish();
                 break;
 
             case R.id.signup_button:
+                signupButton.setEnabled(false);
                 findThePhoneNoInTheTenant();
                 break;
         }
@@ -88,17 +105,20 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
     private void findThePhoneNoInTheTenant() {
         // TODO: 6/5/2019 find this number in the firebase tenant node
         progressBar.setVisibility(View.VISIBLE);
-        DatabaseReference database=FirebaseDatabase.getInstance().getReference("PG").child("0")
-                .child("NotOnBoardTenants");
-        database.addValueEventListener(new ValueEventListener() {
+        notOnBoardDB.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.hasChild(phone)){
-                    tenantSignup();
+                    sendVerificationCode(phone);
+
+                    tenant=dataSnapshot.child(phone).getValue(Tenant.class);
+//                    if (firebaseUser!=null && !firebaseUser.isEmailVerified() && firebaseUser.getUid()!=null)
+//                        ShiftOfTenant.copyTenantFromOnBoardToTenant(firebaseUser.getUid(),tenant);
                 }else{
                     Toast.makeText(PhoneAuthActivity.this,"You are not registered as a tenant in the database!",
                             Toast.LENGTH_LONG).show();
                     progressBar.setVisibility(View.GONE);
+                    signupButton.setEnabled(true);
                 }
             }
 
@@ -109,18 +129,13 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
         });
     }
 
-    private void tenantSignup() {
-        //search in Tenant node
-        sendVerificationCode(phone);
-    }
-
     private void sendVerificationCode(String number){
         PhoneAuthProvider.getInstance().verifyPhoneNumber(phone,60, TimeUnit.SECONDS,
                 TaskExecutors.MAIN_THREAD,mCallback);
     }
 
     private void verifyCode(String code){
-        PhoneAuthCredential phoneAuthCredential=PhoneAuthProvider.getCredential(verificationId,code);
+        phoneAuthCredential=PhoneAuthProvider.getCredential(verificationId,code);
         signInWithCredential(phoneAuthCredential);
     }
 
@@ -135,11 +150,12 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
                     //set flag and call user activity
                     Intent intent=new Intent(PhoneAuthActivity.this,TenantDetailsActivity.class);
                     intent.putExtra("phone",phone);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }else{
                     Toast.makeText(PhoneAuthActivity.this,task.getException().getMessage(),Toast.LENGTH_LONG).show();
                 }
+                progressBar.setEnabled(true);
             }
         });
     }
@@ -155,27 +171,24 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
         public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
             String code=phoneAuthCredential.getSmsCode();
             if(code==null){
-
                 AlertDialog.Builder builder=new AlertDialog.Builder(PhoneAuthActivity.this);
                 builder.setTitle("Enter code below");
                 builder.setMessage("expires in 60 second.");
 
                 final EditText input = new EditText(PhoneAuthActivity.this);
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.MATCH_PARENT);
-                input.setLayoutParams(lp);
+                input.setLayoutParams(layoutParams);
                 builder.setView(input);
 
                 builder.setPositiveButton("Submit",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                otp=input.getText().toString();
+                                otp = input.getText().toString();
                                 verifyCode(otp);
                             }
-                        });
-
-                builder.setNegativeButton("Cancel",
+                        }).setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
@@ -199,7 +212,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
 //    protected void onStart() {
 //        super.onStart();
 //        firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
-//        if(firebaseUser!=null){
+//        if(firebaseUser!=null && !firebaseUser.isEmailVerified()){
 //            Intent intent=new Intent(PhoneAuthActivity.this,TenantDetailsActivity.class);
 //            intent.putExtra("phone",firebaseUser.getPhoneNumber());
 //            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

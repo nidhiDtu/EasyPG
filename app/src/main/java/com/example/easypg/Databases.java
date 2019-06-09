@@ -6,38 +6,38 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public abstract class Databases {
-    private DatabaseReference pgDB;
-    private DatabaseReference tenantsDB;
-    private DatabaseReference onBoardDB;
-    private DatabaseReference notOnBoardDB;
+    private static DatabaseReference pgDB;
+    private static DatabaseReference tenantsDB;
+    private static DatabaseReference onBoardDB;
+    private static DatabaseReference notOnBoardDB;
 
-    StorageReference storageReference;
+    private static StorageReference storageReference;
 
-    public DatabaseReference getPgDB() {
+    public static DatabaseReference getPgDB() {
         if(pgDB==null)
             pgDB= FirebaseDatabase.getInstance().getReference("PG");
         return pgDB;
     }
 
-    public DatabaseReference getTenantsDB() {
+    public static DatabaseReference getTenantsDB() {
         if(tenantsDB==null)
             tenantsDB= FirebaseDatabase.getInstance().getReference("Tenants");
         return tenantsDB;
     }
 
-    public DatabaseReference getOnBoardDB() {
+    public static DatabaseReference getOnBoardDB() {
         if(onBoardDB==null)
             onBoardDB= FirebaseDatabase.getInstance().getReference("PG").child("0").child("OnBoardTenants");
         return onBoardDB;
     }
 
-    public DatabaseReference getNotOnBoardDB() {
+    public static DatabaseReference getNotOnBoardDB() {
         if(notOnBoardDB==null)
             notOnBoardDB= FirebaseDatabase.getInstance().getReference("PG").child("0").child("NotOnBoardTenants");
         return notOnBoardDB;
     }
 
-    public StorageReference getStorageReference() {
+    public static StorageReference getStorageReference() {
         if (storageReference==null)
             storageReference= FirebaseStorage.getInstance().getReference();
         return storageReference;

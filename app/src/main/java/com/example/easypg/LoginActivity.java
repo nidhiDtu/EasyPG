@@ -19,26 +19,26 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextView signup_ref,tenantormanager;
-    Button login;
-    EditText username,password;
-    ProgressBar progressBar;
+    private TextView signup_ref,tenantormanager;
+    private Button login;
+    private EditText username,password;
+    private ProgressBar progressBar;
 
-    FirebaseAuth mAuth;
-    FirebaseUser firebaseUser;
+    //firebase related objects
+    private FirebaseAuth mAuth;
+    private FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAuth=FirebaseAuth.getInstance();
-
         init();
     }
 
     private void init() {
         //to set the UI
+        mAuth=FirebaseAuth.getInstance();
         firebaseUser=mAuth.getCurrentUser();
         username =findViewById(R.id.username);
         password=findViewById(R.id.signin_password);
@@ -87,8 +87,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
 
-        if(pass.length()<8){
-            password.setError("Minimum length of password is atleast characters.");
+        if(pass.length()<6){
+            password.setError("Minimum length of password is atleast 6 characters.");
             password.requestFocus();
             return;
         }
@@ -123,14 +123,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
-//        if(firebaseUser!=null){
-//            Intent intent=new Intent(LoginActivity.this,ManagerPortalActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//            startActivity(intent);
-//        }
-//    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
+        if(firebaseUser!=null && firebaseUser.isEmailVerified()){
+            Intent intent=new Intent(LoginActivity.this,ManagerPortalActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
+    }
 }

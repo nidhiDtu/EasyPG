@@ -3,7 +3,6 @@ package com.example.easypg;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,35 +11,29 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
-import java.io.File;
-import java.io.IOException;
 
 public class TenantDetailsActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextView name,phone,room,rent;
-    Button edit;
-    ImageView profile;
+    private TextView nameText, phoneText, roomText, rentText;
+    private Button editButton;
+    private ImageView profile;
 
-    String id;//phone
-    Tenant tenant;
-    DatabaseReference database;//PG/0/NotOnBoardTenants db
-    FirebaseAuth mAuth;
-    FirebaseUser firebaseUser;
-    StorageReference storageReference;
+    private String phone;//phone
+    private Tenant tenant;
+
+    private StorageReference storageReference;
     private Uri uri;
+    private DatabaseReference notOnBoardDB;
+    private DatabaseReference onBoardDB;
+    private DatabaseReference tenants;
+    private DatabaseReference pg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +41,8 @@ public class TenantDetailsActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_tenant_details);
 
         Intent intent=getIntent();
-        id=intent.getStringExtra("phone");
-        if(id==null) id=firebaseUser.getPhoneNumber();
-        mAuth=FirebaseAuth.getInstance();
-        firebaseUser=mAuth.getCurrentUser();
+        phone=intent.getStringExtra("phone");
+//        if(phone==null) phone=firebaseUser.getPhoneNumber();
         init();
     }
 
@@ -59,25 +50,24 @@ public class TenantDetailsActivity extends AppCompatActivity implements View.OnC
     protected void onStart() {
         super.onStart();
 
-        database=FirebaseDatabase.getInstance().getReference("PG").child("0").child("NotOnBoardTenants").child(id);
+        DatabaseReference child=notOnBoardDB.child(phone);
 
-        database.addValueEventListener(new ValueEventListener() {
+        child.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 tenant=dataSnapshot.getValue(Tenant.class);
                 if(tenant!=null && tenant.getDetails()!=null){
-                    name.setText(tenant.getDetails().getName());
-                    phone.setText(tenant.getDetails().getPhone());
-                    room.setText(tenant.getDetails().getRoom());
-                    rent.setText(tenant.getDetails().getRentAmount());
-
-                    try {
-                        downloadFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    copyTenantFromOnBoardToTenant(firebaseUser.getUid());
+                    nameText.setText(tenant.getDetails().getName());
+                    phoneText.setText(tenant.getDetails().getPhone());
+                    roomText.setText(tenant.getDetails().getRoom());
+                    rentText.setText(tenant.getDetails().getRentAmount());
+//                    try {
+////                        downloadFile();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+////                    }
+//                    if (firebaseUser!=null && !firebaseUser.isEmailVerified())
+                    ShiftOfTenant.copyTenantFromOnBoardToTenant(tenant);
                 }
             }
 
@@ -89,55 +79,38 @@ public class TenantDetailsActivity extends AppCompatActivity implements View.OnC
 
     }
 
-    private void downloadFile() throws IOException {
-        File localFile = File.createTempFile("images", "jpg");
-        storageReference.getFile(localFile)
-                .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        // Successfully downloaded data to local file
-                        // ...
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle failed download
-                // ...
-            }
-        });
-    }
+//    private void downloadFile() throws IOException {
+//        File localFile = File.createTempFile("images", "jpg");
+//        storageReference.getFile(localFile)
+//                .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+//                        // Successfully downloaded data to local file
+//                        // ...
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception exception) {
+//                // Handle failed download
+//                // ...
+//            }
+//        });
+//    }
 
     private void init() {
         profile=findViewById(R.id.profilepic);
-        name=findViewById(R.id.name);
-        phone=findViewById(R.id.phone);
-        room=findViewById(R.id.room);
-        rent=findViewById(R.id.rentAmt);
-        edit=findViewById(R.id.edit_button);
-        database=FirebaseDatabase.getInstance().getReference("PG").child("0").child("NotOnBoardTenants");
-        storageReference= FirebaseStorage.getInstance().getReference();
-        edit.setOnClickListener(this);
-    }
+        nameText =findViewById(R.id.name);
+        phoneText =findViewById(R.id.phone);
+        roomText =findViewById(R.id.room);
+        rentText =findViewById(R.id.rentAmt);
+        editButton =findViewById(R.id.edit_button);
+        editButton.setOnClickListener(this);
 
-    private void copyTenantFromOnBoardToTenant(String authkey) {
-        /*
-        * searched in not on board and copy to tenant and onboard*/
-        DatabaseReference onBoard=FirebaseDatabase.getInstance().getReference("PG").child("0").child("OnBoardTenants");
-        DatabaseReference tenants=FirebaseDatabase.getInstance().getReference("Tenants");
-
-        Tenant newTenant=new Tenant(new Tenant.TenantDetails(tenant.getDetails().name,tenant.getDetails()
-                .phone,tenant.getDetails().room,tenant.getDetails().getRentAmount(),"0"));
-
-        onBoard.child(id).removeValue();
-        tenants.child(authkey).removeValue();
-        String id1=onBoard.child(id).setValue(tenant).toString();
-        String id2=tenants.child(authkey).setValue(newTenant).toString();
-
-        if(id1!=null && id2!=null){
-            Toast.makeText(TenantDetailsActivity.this,"Copied successfully!",Toast.LENGTH_LONG).show();
-        }else{
-            Toast.makeText(TenantDetailsActivity.this,"Can't copy!",Toast.LENGTH_LONG).show();
-        }
+        storageReference= Databases.getStorageReference();
+        onBoardDB=Databases.getOnBoardDB();
+        notOnBoardDB=Databases.getNotOnBoardDB();
+        tenants=Databases.getTenantsDB();
+        pg=Databases.getPgDB();
     }
 
     @Override
@@ -145,23 +118,11 @@ public class TenantDetailsActivity extends AppCompatActivity implements View.OnC
         switch (view.getId()){
             case R.id.edit_button:
                 Intent intent=new Intent(TenantDetailsActivity.this,EditTenantActivity.class);
-                intent.putExtra("phone",id);
-                //request code edit the tenant is 2 and for adding it is 1
-                TenantDetailsActivity.this.finish();
+                intent.putExtra("phone",phone);
+//                TenantDetailsActivity.this.finish();
                 startActivity(intent);
                 break;
         }
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if(requestCode==2){
-//            if(resultCode==2){
-//                Bundle bundle=data.getExtras();
-//                String i=bundle.getString("phone","-1");
-//                if(i!="-1") id=i;
-//            }
-//        }
-//    }
 }

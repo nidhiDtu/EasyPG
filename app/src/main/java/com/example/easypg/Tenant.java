@@ -8,7 +8,9 @@ public class Tenant {
 
     public Tenant() {
     }
-    public Tenant(TenantDetails details) {
+
+    public Tenant(String id, TenantDetails details) {
+        this.id = id;
         this.details = details;
     }
     public TenantDetails getDetails() {
@@ -25,11 +27,11 @@ public class Tenant {
     }
 
     static class TenantDetails{
-        String name;
-        String phone;
-        String room;
-        String rentAmount;
-        String pgId;
+        private String name;
+        private String phone;
+        private String room;
+        private String rentAmount;
+        private String pgId;
 
         public TenantDetails() {
         }

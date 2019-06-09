@@ -25,13 +25,17 @@ import java.util.ArrayList;
 
 public class ManagerPortalActivity extends AppCompatActivity {
 
-    Toolbar toolbar;
-    PG pg;
-    ArrayList<Tenant> onBoardTenants=new ArrayList<>();
-    DatabaseReference database;
-    RecyclerView recyclerView;
-    TenantViewAdapter tenantViewAdapter;
-    ProgressBar progressBar;
+    private Toolbar toolbar;
+    private PG Pg;
+    private ArrayList<Tenant> onBoardTenants=new ArrayList<>();
+    private RecyclerView recyclerView;
+    private TenantViewAdapter tenantViewAdapter;
+    private ProgressBar progressBar;
+
+    private DatabaseReference notOnBoardDB;
+    private DatabaseReference onBoardDB;
+    private DatabaseReference tenants;
+    private DatabaseReference pg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +47,10 @@ public class ManagerPortalActivity extends AppCompatActivity {
     }
 
     private void init() {
-        database= FirebaseDatabase.getInstance().getReference("PG").child("0").child("OnBoardTenants");
+        onBoardDB=Databases.getOnBoardDB();
+        notOnBoardDB=Databases.getNotOnBoardDB();
+        tenants=Databases.getTenantsDB();
+        pg=Databases.getPgDB();
         recyclerView=findViewById(R.id.recyclerview);
         progressBar=findViewById(R.id.progressbar);
 
@@ -75,7 +82,7 @@ public class ManagerPortalActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        database.addValueEventListener(new ValueEventListener() {
+        onBoardDB.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 onBoardTenants.clear();
@@ -91,25 +98,11 @@ public class ManagerPortalActivity extends AppCompatActivity {
                         //when a tenant is selected to view or edit
                         Toast.makeText(getApplicationContext(),"Item touched!",Toast.LENGTH_LONG).show();
                         Tenant tenant=onBoardTenants.get(position);
-                        Intent intent=new Intent(ManagerPortalActivity.this,TenantDetailsActivity.class);
-                        intent.putExtra("phone",tenant.getDetails().getPhone());
+                        Intent intent=new Intent(ManagerPortalActivity.this,ShowTenantProfileImage.class);
+                        intent.putExtra("phone",tenant.getId());
                         startActivity(intent);
                     }
 
-                    @Override
-                    public void onItemLongClick(int position) {
-                        /*
-                        * Delete the item selected ion Long Click
-                        * in future Alertdialog can also be added
-                        * for confirmation before deleting an item
-                        * from the tenant list on PG1*/
-
-                        Toast.makeText(getApplicationContext(),"Item deleted!",Toast.LENGTH_LONG).show();
-                        Tenant tenant=onBoardTenants.get(position);
-                        String id=tenant.getDetails().getPhone();
-                        DatabaseReference item=database.child(id);
-                        item.removeValue();
-                    }
                     });
 
                 recyclerView.setAdapter(tenantViewAdapter);

@@ -17,12 +17,16 @@ import com.google.firebase.database.ValueEventListener;
 
 public class AddTenantActivity extends AppCompatActivity implements View.OnClickListener {
 
-    EditText name,phone,room,rent;
-    Button save;
-    DatabaseReference database;
-    DatabaseReference tenantDatabase;
-    Tenant tenant;
-    Tenant.TenantDetails details;
+    private EditText name,phone,room,rent;
+    private Button save;
+    private DatabaseReference tenantDatabase;
+    private Tenant tenant;
+    private Tenant.TenantDetails details;
+
+    private DatabaseReference notOnBoardDB;
+    private DatabaseReference onBoardDB;
+    private DatabaseReference tenants;
+    private DatabaseReference pg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +38,10 @@ public class AddTenantActivity extends AppCompatActivity implements View.OnClick
 
     private void init() {
 
-        database=FirebaseDatabase.getInstance().getReference("PG").child("0").child("NotOnBoardTenants");
+        onBoardDB=Databases.getOnBoardDB();
+        notOnBoardDB=Databases.getNotOnBoardDB();
+        tenants=Databases.getTenantsDB();
+        pg=Databases.getPgDB();
         name=findViewById(R.id.name_edittext);
         phone=findViewById(R.id.phone_edittext);
         room=findViewById(R.id.room);
@@ -47,13 +54,9 @@ public class AddTenantActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View view) {
 
-
-
         switch (view.getId()){
             case R.id.save:
                 addtenant();
-                finish();
-
                 break;
         }
     }
@@ -71,7 +74,7 @@ public class AddTenantActivity extends AppCompatActivity implements View.OnClick
             this.name.requestFocus();
             return;
         }
-        if (phone.isEmpty()||phone.length()<10){
+        if (phone.isEmpty()||phone.length()<12){
             this.phone.setError("Please add valid phone number!");
             this.phone.requestFocus();
             return;
@@ -88,9 +91,9 @@ public class AddTenantActivity extends AppCompatActivity implements View.OnClick
         }
 
         details=new Tenant.TenantDetails(name,phone,room,rentamt);
-        tenant=new Tenant(details);
+        tenant=new Tenant(phone,details);
 
-        String id=database.child(phone).setValue(tenant).toString();
+        String id=notOnBoardDB.child(phone).setValue(tenant).toString();
         tenant.setId(id);
 
         if(id!=null)

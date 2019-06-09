@@ -19,12 +19,16 @@ import java.util.ArrayList;
 
 public class RegistrationActivity extends AppCompatActivity implements View.OnClickListener {
 
-    EditText name,phone,pgname,pincode,date;
-    Button submit;
+    private EditText name,phone,pgname,pincode,date;
+    private Button submit;
 
-    DatabaseReference database;
-    PG pg;
-    int aboutIntent=1;
+    private PG.PGDetails PgDetails;
+    private int aboutIntent=1;
+
+    private DatabaseReference notOnBoardDB;
+    private DatabaseReference onBoardDB;
+    private DatabaseReference tenants;
+    private DatabaseReference pg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,17 +45,16 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
     protected void onStart() {
         super.onStart();
         if(aboutIntent==2){
-            DatabaseReference database=FirebaseDatabase.getInstance().getReference("PG").child("0");
-            database.addValueEventListener(new ValueEventListener() {
+            pg.child("0").child("details").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    pg=dataSnapshot.getValue(PG.class);
-                    if(pg.getDetails()!=null){
-                        name.setText(pg.getDetails().getName());
-                        phone.setText(pg.getDetails().getPhone());
-                        pgname.setText(pg.getDetails().getPGName());
-                        date.setText(pg.getDetails().getDateCreated());
-                        pincode.setText(pg.getDetails().getPincode());
+                    PgDetails=dataSnapshot.getValue(PG.PGDetails.class);
+                    if(PgDetails!=null){
+                        name.setText(PgDetails.getName());
+                        phone.setText(PgDetails.getPhone());
+                        pgname.setText(PgDetails.getPGName());
+                        date.setText(PgDetails.getDateCreated());
+                        pincode.setText(PgDetails.getPincode());
                     }
                 }
 
@@ -65,7 +68,10 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
 
     private void init() {
         //for a single node of PG
-        database=FirebaseDatabase.getInstance().getReference("PG").child("0");
+        onBoardDB=Databases.getOnBoardDB();
+        notOnBoardDB=Databases.getNotOnBoardDB();
+        tenants=Databases.getTenantsDB();
+        pg=Databases.getPgDB();
 
         name=findViewById(R.id.name_edittext);
         phone=findViewById(R.id.phone_edittext);
@@ -96,22 +102,18 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
 
         PG.PGDetails pgDetails=new PG.PGDetails(name,phone,pgname,pincode,date);
 
-        //id added is taken 0 as for the demo purpose the no. of pgs is only one
-        pg=new PG("0", pgDetails,new ArrayList<Tenant>(),new ArrayList<Tenant>());
-
-        String id=database.setValue(pg).toString();
-
-        pg.setId(id);
+        //phone added is taken 0 as for the demo purpose the no. of pgs is only one
+        PgDetails=new PG.PGDetails(name,phone,pgname,pincode,date);
+        pg.child("0").child("details").setValue(PgDetails);
 
         Intent intent1=new Intent();
         if(aboutIntent==2){
             setResult(2,intent1);
         }else if(aboutIntent==1){
             setResult(1,intent1);
+            Intent intent=new Intent(getApplicationContext(),ManagerPortalActivity.class);
+            startActivity(intent);
         }
-
-        Intent intent=new Intent(getApplicationContext(),ManagerPortalActivity.class);
-        startActivity(intent);
         finish();
     }
 }

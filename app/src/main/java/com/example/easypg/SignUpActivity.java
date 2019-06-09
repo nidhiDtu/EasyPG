@@ -14,31 +14,32 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
-    EditText email,password;
-    Button signup;
-    TextView login_ref;
-    ProgressBar progressBar;
+    private EditText email,password;
+    private Button signup;
+    private TextView login_ref;
+    private ProgressBar progressBar;
 
     private FirebaseAuth mAuth;
-    FirebaseUser firebaseUser;
+    private FirebaseUser firebaseUser;
+    private DatabaseReference pg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-//
-//        // Initialize Firebase Auth
-//        mAuth = FirebaseAuth.getInstance();
 
         init();
     }
 
     private void init() {
-//        database=FirebaseDatabase.getInstance().getReference();
-//        firebaseUser=mAuth.getCurrentUser();
+        pg=Databases.getPgDB();
+        mAuth=FirebaseAuth.getInstance();
+        firebaseUser=mAuth.getCurrentUser();
         email=findViewById(R.id.email);
         password=findViewById(R.id.signup_password);
         signup=findViewById(R.id.signup_button);
@@ -117,23 +118,23 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
-//        if(firebaseUser!=null){
-//            Intent intent=new Intent(SignUpActivity.this,ManagerPortalActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//            startActivity(intent);
-//        }
-//    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
+        if(firebaseUser!=null && firebaseUser.isEmailVerified()){
+            Intent intent=new Intent(SignUpActivity.this,ManagerPortalActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==1){
             if(resultCode==1){
-
+                //nothing to do now
             }
         }
     }

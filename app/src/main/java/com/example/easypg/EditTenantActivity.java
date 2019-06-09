@@ -2,13 +2,19 @@ package com.example.easypg;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +25,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,21 +36,31 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
 
-public class EditTenantActivity extends AppCompatActivity {
+import static android.provider.MediaStore.Images.Media.getBitmap;
+
+public class EditTenantActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int PICK_IMAGE_REQUEST = 5;
     private static final int CAMERA_ACCESS_REQUEST=6;
-    EditText name,phone;
-    TextView room,rent;
-    ImageView profile;
-    Button save,cancel,upload,camera;
+    private static final String IMAGE_DIRECTORY = "/Pictures";
+    private EditText nameEdit;
+    private TextView roomText,rentText,phoneText;
+    private ImageView profile;
+    private Button save,cancel,upload,camera;
 
-    String id;
-    Tenant tenant;
-    DatabaseReference databaseReference;
-    StorageReference storageReference;
+    private String phone;
+    private Tenant tenant;
+    private StorageReference storageReference;
+    private DatabaseReference notOnBoardDB;
+    private DatabaseReference onBoardDB;
+    private DatabaseReference tenants;
+    private DatabaseReference pg;
     private Uri uri;
 
     @Override
@@ -52,7 +69,7 @@ public class EditTenantActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_tenant);
 
         Intent intent=getIntent();
-        id= intent.getStringExtra("phone");
+        phone = intent.getStringExtra("phone");
 
         init();
     }
@@ -60,15 +77,17 @@ public class EditTenantActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        databaseReference.child(id).addValueEventListener(new ValueEventListener() {
+        notOnBoardDB.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    tenant=dataSnapshot.getValue(Tenant.class);
-                    name.setText(tenant.getDetails().getName());
-                    phone.setText(tenant.getDetails().getPhone());
-                    room.setText(tenant.getDetails().getRoom());
-                    rent.setText(tenant.getDetails().getRentAmount());
+                if (dataSnapshot.child(phone).exists()){
+                    tenant=dataSnapshot.child(phone).getValue(Tenant.class);
+                    if(tenant.getDetails()!=null){
+                        nameEdit.setText(tenant.getDetails().getName());
+                        phoneText.setText(tenant.getDetails().getPhone());
+                        roomText.setText(tenant.getDetails().getRoom());
+                        rentText.setText(tenant.getDetails().getRentAmount());
+                    }
                 }
             }
 
@@ -80,95 +99,26 @@ public class EditTenantActivity extends AppCompatActivity {
     }
 
     private void init() {
-        databaseReference= FirebaseDatabase.getInstance().getReference("PG").child("0").child("NotOnBoardTenants");
-        storageReference= FirebaseStorage.getInstance().getReference();
-        name=findViewById(R.id.name_edittext);
-        phone=findViewById(R.id.phone_edittext);
-        room=findViewById(R.id.room);
-        rent=findViewById(R.id.rentAmt);
+        nameEdit=findViewById(R.id.name_edittext);
+        phoneText=findViewById(R.id.phone_edittext);
+        roomText=findViewById(R.id.room);
+        rentText=findViewById(R.id.rentAmt);
         profile=findViewById(R.id.profilepic);
         save=findViewById(R.id.save);
         cancel=findViewById(R.id.cancel);
         camera=findViewById(R.id.camera);
         upload=findViewById(R.id.upload);
 
-        upload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //upload profile
-//                Intent intent=new Intent(EditTenantActivity.this,UploadImage.class);
-//                intent.putExtra("phone",id);
-                showFileChooser();
-            }
-        });
+        storageReference= Databases.getStorageReference();
+        onBoardDB=Databases.getOnBoardDB();
+        notOnBoardDB=Databases.getNotOnBoardDB();
+        tenants=Databases.getTenantsDB();
+        pg=Databases.getPgDB();
 
-        camera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent,CAMERA_ACCESS_REQUEST);
-            }
-        });
-
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                save.setEnabled(false);
-                camera.setEnabled(false);
-                upload.setEnabled(false);
-                finish();
-            }
-        });
-
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String newName=name.getText().toString();
-                String newPhone=phone.getText().toString();
-
-                final Tenant newTenant=new Tenant(new Tenant.TenantDetails
-                        (newName,newPhone,tenant.getDetails().getRoom(),
-                                tenant.getDetails().getRentAmount(),
-                                tenant.getDetails().getPgId()));
-
-                //updating in Tenants
-                final DatabaseReference tenants=FirebaseDatabase.getInstance()
-                        .getReference("Tenants");
-                tenants.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot child:dataSnapshot.getChildren()){
-                            Tenant ref=child.getValue(Tenant.class);
-                            if(ref.getDetails().getPhone()==id && !dataSnapshot.hasChild(ref.getId())){
-                                DatabaseReference newRef=tenants.child(ref.getId()).child("details");
-                                newRef.removeValue();
-                                newRef.setValue(ref.getDetails());
-                                break;
-                            }
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) { }
-                });
-
-                //updating tenant in noOnBoardtenants
-                DatabaseReference notOnBoard=FirebaseDatabase.getInstance().getReference("PG").child("0").child("NotOnBoardTenants");
-                notOnBoard.child(id).removeValue();
-                notOnBoard.child(newPhone).setValue(newTenant);
-
-                //updating tenant in onBoardtenants
-                DatabaseReference onboard=FirebaseDatabase.getInstance()
-                        .getReference("PG").child("0").child("OnBoardTenants");
-
-                onboard.child(id).removeValue();
-                id=onboard.child(newPhone).setValue(newTenant).toString();
-                Toast.makeText(EditTenantActivity.this,id,Toast.LENGTH_LONG).show();
-//                Intent intent=new Intent();
-//                intent.putExtra("phone",id);
-//                setResult(2,intent);
-                finish();
-            }
-        });
+        upload.setOnClickListener(this);
+        camera.setOnClickListener(this);
+        cancel.setOnClickListener(this);
+        save.setOnClickListener(this);
     }
 
     private void showFileChooser(){
@@ -185,7 +135,7 @@ public class EditTenantActivity extends AppCompatActivity {
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            StorageReference Ref = storageReference.child("images/"+id+"-profilejpg");
+            StorageReference Ref = storageReference.child("images/"+ phone +"-profilejpg");
 
             Ref.putFile(uri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -223,10 +173,10 @@ public class EditTenantActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode==PICK_IMAGE_REQUEST && resultCode==RESULT_OK
                 && data!=null && data.getData()!=null){
-//image selected successfully
+            //image selected successfully
             uri=data.getData();
             try {
-                Bitmap bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
+                Bitmap bitmap= getBitmap(getContentResolver(),uri);
                 profile.setImageBitmap(bitmap);
                 uploadFile();
             } catch (IOException e) {
@@ -236,19 +186,93 @@ public class EditTenantActivity extends AppCompatActivity {
         if (requestCode==CAMERA_ACCESS_REQUEST && resultCode==RESULT_OK
                 && data!=null && data.getData()!=null){
             uri=data.getData();
+            Bitmap bitmap = null;
             try {
-                Bitmap bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
-                profile.setImageBitmap(bitmap);
-                uploadFile();
+                bitmap= getBitmap(getContentResolver(),uri);
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+            if(bitmap!=null){
+                saveImage(bitmap);
+                profile.setImageBitmap(bitmap);
+                uploadFile();
+                Toast.makeText(getApplicationContext(), "Image Saved!", Toast.LENGTH_SHORT).show();
+            }else{
+                Log.d("BITMAP","Bitmap is null");
             }
         }
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        super.onBackPressed();
-//        finish();
-//    }
+    private void captureCameraImage() {
+        Intent chooserIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        chooserIntent.setType("image/+");
+        chooserIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        startActivityForResult(chooserIntent, CAMERA_ACCESS_REQUEST);
+    }
+
+    public String saveImage(Bitmap myBitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        myBitmap.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+        File wallpaperDirectory = new File(Environment.getExternalStorageDirectory() + IMAGE_DIRECTORY);
+        if (!wallpaperDirectory.exists()) {  // have the object build the directory structure, if needed.
+            wallpaperDirectory.mkdirs();
+        }
+
+        try {
+            File f = new File(wallpaperDirectory, Calendar.getInstance().getTimeInMillis() + ".jpg");
+            f.createNewFile();
+            FileOutputStream fo = new FileOutputStream(f);
+            fo.write(bytes.toByteArray());
+            MediaScannerConnection.scanFile(this,
+                    new String[]{f.getPath()},
+                    new String[]{"image/jpeg"}, null);
+            fo.close();
+            Log.d("TAG", "File Saved::---&gt;" + f.getAbsolutePath());
+
+            return f.getAbsolutePath();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return "";
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.save:
+                saveDetails();
+                break;
+
+            case R.id.camera:
+               captureCameraImage();
+                break;
+
+            case R.id.cancel:
+                save.setEnabled(false);
+                camera.setEnabled(false);
+                upload.setEnabled(false);
+                finish();
+                break;
+
+            case R.id.upload:
+                showFileChooser();
+                break;
+        }
+    }
+
+    private void saveDetails() {
+        String newName=nameEdit.getText().toString();
+        tenant.getDetails().setName(newName);
+
+        //updating tenant in noOnBoardtenants
+        Tenant.TenantDetails tenantDetails=tenant.getDetails();
+
+        DatabaseReference childTenant=Databases.getNotOnBoardDB().child(phone).child("details");
+        childTenant.child("name").setValue(tenantDetails.getName());
+        childTenant.child("phone").setValue(tenantDetails.getPhone());
+        childTenant.child("room").setValue(tenantDetails.getRoom());
+        childTenant.child("rentAmount").setValue(tenantDetails.getRentAmount());
+        ShiftOfTenant.copyTenantFromOnBoardToTenant(tenant);
+        finish();
+    }
 }
